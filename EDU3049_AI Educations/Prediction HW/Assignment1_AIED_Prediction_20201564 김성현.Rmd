@@ -1,0 +1,61 @@
+---
+title: "AIED_Prediction_Assignment1"
+author: "20201564 김성현"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+## Set the working directory and read in the dataset (`PISA2018MS_KOR_BQ.rdata`)
+
+```{r readin}
+infile <- outfile <-  "C:/aied"
+setwd(infile) 
+getwd()
+load("PISA2018MS_KOR_BQ.Rdata")
+class(PISA2018MS_KOR)
+```
+
+## Prediction task using the linear regression
+
+### Check the dimension of the dataset
+```{r dim}
+dim(PISA2018MS_KOR)
+```
+
+### Compute the mean and sd of PV1MATH variable (outcome variable)
+```{r outcome}
+mean(PISA2018MS_KOR$PV1MATH)
+sd(PISA2018MS_KOR$PV1MATH)
+```
+
+### Fit the following three prediction models and return the summary of each model: 
+* M1: PV1MATH by EMOSUPS
+* M2: PV1MATH by explanatory variable: EMOSUPS,  ST004D01T (gender)
+* M3: PV1MATH by explanatory variables: EMOSUPS, ST004D01T (gender), interaction between EMOSUPS and ST004D01T (gender)
+```{r linear_reg}
+M1 <- lm(PV1MATH ~ EMOSUPS, data=PISA2018MS_KOR)
+summary(M1)
+M2 <- lm(PV1MATH ~ as.factor(ST004D01T) + EMOSUPS, data = PISA2018MS_KOR)
+summary(M2)
+M3 <- lm(PV1MATH ~ as.factor(ST004D01T) +  EMOSUPS + as.factor(ST004D01T):EMOSUPS, data = PISA2018MS_KOR)
+summary(M3)
+```
+
+### Interpret the coefficients of M2 and M3
+#### M2 Results
+* intercept = 522.432: 
+* ST004D01T =  7.162: 
+* EMOSUPS   = 15.699: 
+
+#### M3 Results
+* intercept = 522.544: 
+* ST004D01T =  6.937:
+* EMOSUPS   =  14.548:
+* as.factor(ST004D01T) =  2.190:
+* Interaction term shows that One unit increase in EMOSUPS is associated with 14.548 higher mathematics score, on average, for girls, and 16.738 (14.548+2.190) higher mathematics score, on average, for boys.
+
+# Check the assumptions of M2 using the `plot` function
+```{r assumption}
+plot(M2)
+```
+

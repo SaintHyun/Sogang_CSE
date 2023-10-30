@@ -1,0 +1,4 @@
+﻿  20201564.cpp
+C:\서강\###4학기\2. 데이터베이스시스템\프로젝트2\Project2\Project2\20201564.cpp(585,38): warning C4244: '인수': 'double'에서 'size_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\서강\###4학기\2. 데이터베이스시스템\프로젝트2\Project2\Project2\20201564.cpp(586,33): warning C4244: '인수': 'double'에서 'size_t'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Project2.vcxproj -> C:\서강\###4학기\2. 데이터베이스시스템\프로젝트2\Project2\x64\Debug\Project2.exe

@@ -1,0 +1,363 @@
+create table Customer
+(C_ID	char(7) not null,
+name	varchar(20) not null,
+phone_number	varchar(20) not null,
+address	varchar(20) not null,
+age	integer not null,
+primary key(C_ID),
+check(C_ID >='0000000' and C_ID <'1000000'));
+
+create table Store
+(S_ID 	char(7) not null,
+name varchar(20) not null,
+region varchar(20) not null,
+primary key(S_ID),
+check(S_ID >='1000000' and S_ID <'1500000'));
+
+create table Brand
+(Brand_ID		char(7) not null,
+name varchar(20) not null,
+contact	varchar(20) not null,
+primary key(Brand_ID),
+check(Brand_ID>='1500000' and Brand_ID<'2000000'));
+
+create table Component
+(Com_ID	char(7) not null,
+Brand_ID	char(7) not null,
+foreign key (Brand_ID) references Brand(Brand_ID) on delete cascade,
+price integer not null,
+name varchar(20) not null,
+primary key(Com_ID),
+check(Com_ID>='2000000' and Com_ID<'2500000'));
+
+
+create table Manufacturer
+(Manu_ID  char(7) not null,
+name varchar(20) not null,
+contact varchar(20) not null,
+primary key(Manu_ID),
+check(Manu_ID>='2500000' and Manu_ID<'3000000'));
+
+create table Ordering
+(Com_ID char(7) not null,
+Manu_ID  char(7) not null,
+quantity integer not null,
+primary key (Com_ID,Manu_ID),
+foreign key (Com_ID) references Component(Com_ID) on delete cascade,
+foreign key (Manu_ID) references Manufacturer(Manu_ID) on delete cascade);
+
+create table Management
+(S_ID char(7) not null,
+Com_ID	char(7) not null,
+store_amount integer,
+warehouse_amount integer,
+primary key (S_ID,Com_ID),
+foreign key (S_ID) references Store(S_ID) on delete cascade,
+foreign key (Com_ID) references Component(Com_ID) on delete cascade);
+
+create table Product
+(P_ID char(7) not null,
+tot_price integer not null,
+quantity integer not null,
+type varchar(20) not null,
+primary key (P_ID),
+check(P_ID>='3000000' and P_ID<'4000000'));
+
+create table Package
+(P_ID char(7) not null,
+Com_ID	char(7) not null,
+primary key(P_ID,Com_ID),
+foreign key (P_ID) references Product(P_ID) on delete cascade,
+foreign key (Com_ID) references Component(Com_ID) on delete cascade);
+
+create table Payment
+(pay_type char(7) not null,
+C_ID char(7) not null,
+card_number varchar(20),
+account varchar(20),
+primary key (pay_type,C_ID),
+foreign key (C_ID) references Customer(C_ID) on delete cascade);
+
+create table Shipper
+(Shipper_ID char(7) not null,
+name varchar(20) not null,
+contact varchar(20) not null,
+primary key(Shipper_ID),
+check(Shipper_ID>='4000000' and Shipper_ID<'4500000'));
+
+create table Tracking
+(Tracking_number char(9) not null,
+Shipper_ID char(7) not null,
+expected_date date not null,
+arrived_date date,
+primary key(Tracking_number),
+foreign key (Shipper_ID) references Shipper(Shipper_ID) on delete cascade);
+
+create table Sale
+(Sales_ID char(7) not null,
+P_ID char(7) not null,
+C_ID char(7) not null,
+S_ID char(7) not null,
+Tracking_number char(9) not null,
+saled_date date not null,
+saled_type varchar(20) not null,
+pay_type char(7) not null,
+primary key(Sales_ID),
+check (Sales_ID>='7000000' and Sales_ID<='9999999'),
+foreign key (C_ID) references Customer(C_ID) on delete cascade,
+foreign key (P_ID) references Product(P_ID) on delete cascade,
+foreign key (S_ID) references Store(S_ID) on delete cascade,
+foreign key (Tracking_number) references Tracking(Tracking_number));
+
+
+insert into Customer values('0000000','Jung','010-1111-2222','Seoul Mapo','57');
+insert into Customer values('0000001','Kim','010-1111-3333','Gyeongi Gwangmyeong','22');
+insert into Customer values('0000002','Chang','010-1111-4444','Seoul Gangdong','53');
+insert into Customer values('0000003','Nang','010-5555-2222','Seoul Songpa','55');
+insert into Customer values('0000004','Lim','010-6666-2222','Seoul Eunpyeong','60');
+insert into Customer values('0000005','Lee','010-6666-3333','Seoul Gangbuk','32');
+insert into Customer values('0000006','Choi','010-6666-4443','Gyeongi Bundang','34');
+insert into Customer values('0000007','Yang','010-6656-3333','Gangwon Wonju','49');
+insert into Customer values('0000008','Seo','010-7666-3333','Busan Haewondaegu','66');
+insert into Customer values('0000009','Park','010-6666-3443','Gyeongbuk Munkyung','63');
+insert into Customer values('0000010','Oh','010-6866-3333','Incheon Gyeyanggu','68');
+insert into Customer values('0000011','Koo','010-8666-6433','Seoul Gangnam','57');
+insert into Customer values('0000012','Min','010-9666-3333','Chungbuk Jeungpyeong','22');
+insert into Customer values('0000013','Kang','010-9766-3483','Jeju Jeju','29');
+insert into Customer values('0000014','Hong','010-7666-4563','Oceania Australia','22');
+
+insert into Store values('1000000','Victor','Seoul');
+insert into Store values('1000001','Yonex','California');
+insert into Store values('1000002','Joobong','Gyenggi');
+insert into Store values('1000003','Adidas','Gangwon');
+insert into Store values('1000004','Nike','Jenonbuk');
+insert into Store values('1000005','Babolot','California');
+insert into Store values('1000006','Gosen','Chungbuk');
+insert into Store values('1000007','Lining','Chungnam');
+insert into Store values('1000008','Newbalance','Gyeongbuk');
+insert into Store values('1000009','Asics','Gyeongnam');
+insert into Store values('1000010','Vamos','Jeju');
+insert into Store values('1000011','Kookle','California');
+insert into Store values('1000012','Namazon','Brazil');
+insert into Store values('1000013','Coupeong','Germany');
+insert into Store values('1000014','Asus','France');
+
+insert into Brand values('1500000','Hyundai','02-460-3819');
+insert into Brand values('1500001','Kia','02-470-5869');
+insert into Brand values('1500002','Samsung','031-560-5719');
+insert into Brand values('1500003','LG','051-460-3819');
+insert into Brand values('1500004','Kakao','031-679-5119');
+insert into Brand values('1500005','Naver','02-750-0619');
+insert into Brand values('1500006','Line','031-560-6869');
+insert into Brand values('1500007','Coupang','02-680-9567');
+insert into Brand values('1500008','Uahan','02-466-7777');
+insert into Brand values('1500009','Yogiyo','02-012-3465');
+insert into Brand values('1500010','SK','031-512-3665');
+insert into Brand values('1500011','NC','031-666-7465');
+insert into Brand values('1500011','Nexon','031-333-5565');
+insert into Brand values('1500012','Netmarble','031-976-7565');
+insert into Brand values('1500013','Smilegate','031-663-9654');
+insert into Brand values('1500014','Sinsegye','02-865-9545');
+
+insert into Component values('2000000','1500000','3500','RTX3050');
+insert into Component values('2000001','1500000','4500','RTX3060');
+insert into Component values('2000002','1500000','15000','RTX3090');
+insert into Component values('2000003','1500001','3500','i5-11540');
+insert into Component values('2000004','1500001','5500','i7-11700');
+insert into Component values('2000005','1500002','2500','32inch144Hz');
+insert into Component values('2000006','1500002','1500','27inch75Hz');
+insert into Component values('2000007','1500003','1500','700W');
+insert into Component values('2000008','1500004','1600','B450M');
+insert into Component values('2000009','1500014','3500','Z480');
+insert into Component values('2000010','1500004','1000','H410M');
+insert into Component values('2000011','1500005','1050','LightKey');
+insert into Component values('2000012','1500013','1050','BlueKey');
+insert into Component values('2000013','1500005','1050','RedKey');
+insert into Component values('2000014','1500006','2000','G340W');
+insert into Component values('2000015','1500006','1000','G520');
+insert into Component values('2000016','1500006','3000','GPro');
+insert into Component values('2000017','1500007','500','Cooler');
+insert into Component values('2000018','1500008','1500','Case');
+insert into Component values('2000019','1500009','1600','M2SSD');
+insert into Component values('2000020','1500009','3100','NVMESSD');
+insert into Component values('2000021','1500010','500','HDD');
+insert into Component values('2000022','1500011','350','ODD');
+insert into Component values('2000023','1500012','540','Cable');
+
+insert into Manufacturer values('2500000','Dongsan','1111-6666');
+insert into Manufacturer values('2500001','Yangsan','1171-6666');
+insert into Manufacturer values('2500002','Nangsan','1151-6666');
+insert into Manufacturer values('2500003','Nongsan','1231-6666');
+insert into Manufacturer values('2500004','Namsan','1181-6666');
+insert into Manufacturer values('2500005','Buksan','1311-6666');
+insert into Manufacturer values('2500006','Seosan','1211-6666');
+insert into Manufacturer values('2500007','Yongsan','1521-6666');
+insert into Manufacturer values('2500008','Bingsan','1621-6666');
+insert into Manufacturer values('2500009','Visang','1571-6666');
+insert into Manufacturer values('2500010','Sangsan','6521-6666');
+insert into Manufacturer values('2500011','Bangsan','2521-6666');
+insert into Manufacturer values('2500012','Asan','7521-6666');
+insert into Manufacturer values('2500013','Gwangsan','9531-6666');
+insert into Manufacturer values('2500014','Mangsang','1591-6666');
+
+insert into Ordering values('2000000','2500000','2');
+insert into Ordering values('2000001','2500000','1');
+insert into Ordering values('2000002','2500000','4');
+insert into Ordering values('2000003','2500001','2');
+insert into Ordering values('2000004','2500001','3');
+insert into Ordering values('2000005','2500004','5');
+insert into Ordering values('2000006','2500004','8');
+insert into Ordering values('2000007','2500006','3');
+insert into Ordering values('2000008','2500007','10');
+insert into Ordering values('2000009','2500007','12');
+insert into Ordering values('2000010','2500008','5');
+insert into Ordering values('2000011','2500009','5');
+insert into Ordering values('2000012','2500010','5');
+insert into Ordering values('2000013','2500011','1');
+insert into Ordering values('2000014','2500012','5');
+insert into Ordering values('2000015','2500012','4');
+insert into Ordering values('2000016','2500012','9');
+insert into Ordering values('2000017','2500005','3');
+insert into Ordering values('2000018','2500005','8');
+insert into Ordering values('2000019','2500013','5');
+insert into Ordering values('2000020','2500013','8');
+insert into Ordering values('2000021','2500013','7');
+insert into Ordering values('2000022','2500014','3');
+insert into Ordering values('2000023','2500014','5');
+
+insert into Management values('1000000','2000000','5','5');
+insert into Management values('1000000','2000001','4','5');
+insert into Management values('1000001','2000002','0','0');
+insert into Management values('1000001','2000003','4','2');
+insert into Management values('1000002','2000004','7','5');
+insert into Management values('1000003','2000005','5','8');
+insert into Management values('1000004','2000006','5','10');
+insert into Management values('1000004','2000007','6','11');
+insert into Management values('1000005','2000008','0','0');
+insert into Management values('1000005','2000009','5','4');
+insert into Management values('1000005','2000010','0','0');
+insert into Management values('1000006','2000011','5','4');
+insert into Management values('1000006','2000012','5','4');
+insert into Management values('1000007','2000013','5','4');
+insert into Management values('1000007','2000014','5','4');
+insert into Management values('1000008','2000015','0','0');
+insert into Management values('1000009','2000016','5','4');
+insert into Management values('1000009','2000017','5','4');
+insert into Management values('1000010','2000018','0','0');
+insert into Management values('1000011','2000019','5','4');
+insert into Management values('1000012','2000020','5','4');
+insert into Management values('1000013','2000021','5','4');
+insert into Management values('1000013','2000022','5','4');
+insert into Management values('1000014','2000023','3','4');
+
+insert into Product values('3000000','50000','4','Com');
+insert into Product values('3000001','40000','1','Monitor');
+insert into Product values('3000002','30000','5','Graphic');
+insert into Product values('3000003','20000','3','Keyboard');
+insert into Product values('3000004','22000','7','Mouse');
+insert into Product values('3000005','56000','8','Item');
+insert into Product values('3000006','70000','1','Bonche');
+insert into Product values('3000007','90000','2','CD');
+insert into Product values('3000008','120000','5','Hard');
+insert into Product values('3000009','130000','6','Solid');
+insert into Product values('3000010','130000','6','Card');
+insert into Product values('3000011','140000','4','Soft');
+insert into Product values('3000012','150000','2','Ware');
+insert into Product values('3000013','160000','1','QWERTY');
+insert into Product values('3000014','120000','6','Water');
+
+insert into Package values('3000000','2000000');
+insert into Package values('3000000','2000001');
+insert into Package values('3000001','2000002');
+insert into Package values('3000002','2000003');
+insert into Package values('3000002','2000004');
+insert into Package values('3000003','2000005');
+insert into Package values('3000003','2000006');
+insert into Package values('3000004','2000007');
+insert into Package values('3000004','2000008');
+insert into Package values('3000005','2000009');
+insert into Package values('3000005','2000010');
+insert into Package values('3000006','2000011');
+insert into Package values('3000007','2000012');
+insert into Package values('3000008','2000013');
+insert into Package values('3000009','2000014');
+insert into Package values('3000010','2000015');
+insert into Package values('3000011','2000016');
+insert into Package values('3000011','2000017');
+insert into Package values('3000012','2000018');
+insert into Package values('3000012','2000019');
+insert into Package values('3000013','2000020');
+insert into Package values('3000013','2000021');
+insert into Package values('3000014','2000022');
+insert into Package values('3000014','2000023');
+
+insert into Payment values('online','0000000','12345678',null);
+insert into Payment values('online','0000001','12355678',null);
+insert into Payment values('online','0000002','12365678',null);
+insert into Payment values('online','0000003','12375878',null);
+insert into Payment values('online','0000004','12325678',null);
+insert into Payment values('online','0000005','12395678',null);
+insert into Payment values('online','0000006','12355678',null);
+insert into Payment values('offline','0000007',null,'8888-4444');
+insert into Payment values('offline','0000008',null,'3333-4444');
+insert into Payment values('offline','0000009',null,'1111-2222');
+insert into Payment values('online','0000010','12325676',null);
+insert into Payment values('online','0000011','12395672',null);
+insert into Payment values('online','0000012','12355673',null);
+insert into Payment values('offline','0000013',null,'8488-4444');
+insert into Payment values('offline','0000014',null,'3343-4424');
+
+insert into Shipper values('4000000','CJ','111-2222');
+insert into Shipper values('4000001','QJ','141-2222');
+insert into Shipper values('4000002','USPC','121-2222');
+insert into Shipper values('4000003','RJ','114-2222');
+insert into Shipper values('4000004','GJ','117-2222');
+insert into Shipper values('4000005','HJ','111-8222');
+insert into Shipper values('4000006','SJ','111-9222');
+insert into Shipper values('4000007','USPS','111-2122');
+insert into Shipper values('4000008','KJ','111-6222');
+insert into Shipper values('4000009','PJ','111-2229');
+insert into Shipper values('4000010','HJ','101-2229');
+insert into Shipper values('4000011','MJ','711-2229');
+insert into Shipper values('4000012','NJ','211-2229');
+insert into Shipper values('4000013','BJ','221-2229');
+insert into Shipper values('4000014','TJ','781-2229');
+insert into Shipper values('4499999','None','None');
+
+insert into Tracking values('ABCD12345','4000000','20220304',null);
+insert into Tracking values('ABCE12345','4000001','20220304','20220304');
+insert into Tracking values('ABCF12345','4000002','20220304','20220302');
+insert into Tracking values('ABCG12345','4000003','20220305',null);
+insert into Tracking values('ABCA12345','4000004','20220306','20220315');
+insert into Tracking values('ABCK12345','4000005','20220307',null);
+insert into Tracking values('ABCH12347','4000006','20220306','20220315');
+insert into Tracking values('ABCH12345','4000007','20220306',null);
+insert into Tracking values('ABCH12348','4000007','20220311','20220315');
+insert into Tracking values('ABCH12349','4000007','20220315','20220315');
+insert into Tracking values('ABCH12310','4000008','20220304','20220311');
+insert into Tracking values('ABCH12311','4000009','20220316','20220311');
+insert into Tracking values('ABCH12312','4000010','20220304','20220311');
+insert into Tracking values('ABCH12313','4000010','20210617','20210511');
+insert into Tracking values('ABCH12314','4000012','20210305','20210410');
+insert into Tracking values('ZZZZ99999','4499999','99991231',null);
+
+insert into Sale values('7000000','3000000','0000000','1000000','ABCH12349','20210311','online','online');
+insert into Sale values('7000001','3000000','0000001','1000000','ABCH12310','20220301','online','online');
+insert into Sale values('7000002','3000001','0000002','1000000','ABCH12345','20210301','online','online');
+insert into Sale values('7000003','3000002','0000004','1000000','ABCE12345','20220301','online','online');
+insert into Sale values('7000004','3000003','0000005','1000001','ABCF12345','20220205','online','online');
+insert into Sale values('7000005','3000005','0000008','1000002','ZZZZ99999','20210319','offline','offline');
+insert into Sale values('7000006','3000004','0000007','1000003','ZZZZ99999','20220320','offline','offline');
+insert into Sale values('7000007','3000011','0000006','1000004','ABCD12345','20210301','online','online');
+insert into Sale values('7000008','3000008','0000008','1000005','ABCH12314','20220201','online','online');
+insert into Sale values('7000009','3000010','0000009','1000005','ZZZZ99999','20210201','offline','offline');
+insert into Sale values('7000010','3000011','0000009','1000008','ZZZZ99999','20210201','offline','offline');
+insert into Sale values('7000011','3000012','0000009','1000009','ZZZZ99999','20210201','offline','offline');
+insert into Sale values('7000012','3000011','0000009','1000000','ABCH12347','20220201','online','online');
+insert into Sale values('7000013','3000011','0000009','1000000','ZZZZ99999','20210201','offline','offline');
+insert into Sale values('7000014','3000013','0000009','1000000','ABCH12348','20220201','online','online');
+insert into Sale values('7000015','3000013','0000002','1000011','ABCG12345','20220201','online','online');
+insert into Sale values('7000016','3000013','0000004','1000013','ABCA12345','20220201','online','online');
+insert into Sale values('7000017','3000014','0000011','1000014','ABCK12345','20220201','online','online');
+insert into Sale values('7000018','3000013','0000004','1000012','ABCH12311','20220201','online','online');
+insert into Sale values('7000019','3000014','0000012','1000014','ABCH12313','20220201','online','online');

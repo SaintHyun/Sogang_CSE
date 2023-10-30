@@ -1,0 +1,101 @@
+---
+title: "AIED_Classification_Assignment2"
+author: "20201564 김성현"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+### Set the working directory and read in the dataset (`PISA2018MS_KOR_BQ.rdata`)
+
+```{r readin}
+infile <- outfile <-  "C:/aied"
+setwd(infile) 
+getwd()
+load("PISA2018MS_KOR_BQ.Rdata")
+class(PISA2018MS_KOR)
+```
+
+### Classification using the logistic regression
+
+#### Make the table of the outcome variable `EC154Q02IA`
+* EC154Q02IA: attending additional instruction in mathematics
+* Make sure to to include if there are any missing cases (`useNA='always'`)
+
+```{r NAcheck}
+table(PISA2018MS_KOR$EC154Q02IA, useNA='always')
+```
+
+#### Treatment of outcome variable
+* Remove the missing cases of the outcome variable 
+* Check the dimension
+* Recode 1 -> 0 & 2 -> 1
+* Create the table again to check if the recoding is done successfully
+```{r outcome}
+PISA2018MS_KOR <- PISA2018MS_KOR[!is.na(PISA2018MS_KOR$EC154Q02IA),]
+dim(PISA2018MS_KOR)
+PISA2018MS_KOR$EC154Q02IA <- PISA2018MS_KOR$EC154Q02IA - 1 # recode 1 -> 0 & 2 -> 1
+
+table(PISA2018MS_KOR$EC154Q02IA, useNA='always')
+contab <- table(math = PISA2018MS_KOR$EC154Q02IA, gender = PISA2018MS_KOR$ST004D01T)
+contab_margins <- addmargins(contab)
+contab_margins
+```
+
+###  Three ways to compute proportions: outcome variable by gender 
+#### Create three types of tables 
+```{r proportions}
+prop.table(contab)
+prop.table(contab, margin = 1)
+prop.table(contab, margin = 2)
+
+```
+
+#### Interpret the proportions of each table
+
+* Out of total observations, 30.4% are male who do not attending additional instruction in mathematics while 21.2% are male who do attending additional instruction in mathematics. 29.3% are female who do not attending additional instruction in mathematics while 19.1% are female who do attending additional instruction in mathematics.
+* Among the students who do not attend additional instruction in math (conditional on math == 1), 49.1% are female students and 50.9% are male students
+* Among female students (conditional on gender == 1), 39.4% do attending additional instruction in mathematics while 60.6% do not attending additional instruction in mathematics.
+
+### Logistic regression
+#### Fit the following three logistic regressions (no interpretation is required)
+* M1: EC154Q02IA by ST004D01T (gender)
+* M2: EC154Q02IA by explanatory variable: PV1MATH,  ST004D01T (gender)
+* M3: EC154Q02IA by explanatory variables: PV1MATH, ST004D01T (gender), interaction between PV1MATH and ST004D01T (gender)
+
+```{r logit_reg}
+M1 <- glm(EC154Q02IA ~ as.factor(ST004D01T), data = PISA2018MS_KOR, family = "binomial")
+summary(M1)
+M2 <- glm(EC154Q02IA ~ as.factor(ST004D01T) + PV1MATH, data = PISA2018MS_KOR, family = "binomial")
+summary(M2)
+M3 <- glm(EC154Q02IA ~ as.factor(ST004D01T) + PV1MATH + as.factor(ST004D01T):PV1MATH, data = PISA2018MS_KOR, family = "binomial")
+summary(M3)
+```
+
+
+### [BONUS] Model Evaluation (5 points)
+#### Predict the probabilities and values (either 0 or 1) from each model
+* Keep `get_logistic_pred` function 
+* You need to generate three sets of predicted values based on each model (M1, M2, M3)
+```{r logit_pred}
+get_logistic_pred = function(mod, data, res = "y", pos = 1, neg = 0, cut = 0.5) {
+  probs = predict(mod, newdata = data, type = "response")
+  ifelse(probs >= cut, pos, neg)
+}
+pred_M1 <- get_logistic_pred(M1, data=PISA2018MS_KOR, res="EC154Q02IA", cut = 0.5)
+tab_M1 <- table(pred=pred_M1, actual=PISA2018MS_KOR$EC154Q02IA)
+pred_M2 <- get_logistic_pred(M2, data=PISA2018MS_KOR, res="EC154Q02IA", cut = 0.5)
+tab_M2 <- table(pred=pred_M2, actual=PISA2018MS_KOR$EC154Q02IA)
+pred_M3 <- get_logistic_pred(M3, data=PISA2018MS_KOR, res="EC154Q02IA", cut = 0.5)
+tab_M3 <- table(pred=pred_M3, actual=PISA2018MS_KOR$EC154Q02IA)
+```
+
+#### Evaluate models (M2 & M3) based on the following quantities
+* Report Accuracy, Specificity, Subjectivity, F1 score from M2 & M3
+* Use `confusion matrix`
+```{r confmat}
+#install.packages("caret")
+library(caret)
+confusionMatrix(tab_M2, mode='everything', positive="1")
+confusionMatrix(tab_M3,  mode='everything',positive="1")
+
+```

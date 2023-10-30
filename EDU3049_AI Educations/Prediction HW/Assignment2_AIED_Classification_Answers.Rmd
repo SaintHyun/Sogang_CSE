@@ -1,0 +1,93 @@
+---
+title: "AIED_Classification_Assignment2"
+author: "Hyo Jeong Shin"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+### Set the working directory and read in the dataset (`PISA2018MS_KOR_BQ.rdata`)
+
+```{r readin}
+infile <- outfile <-  "/Users/hyojeong/Library/Mobile Documents/com~apple~CloudDocs/Teaching/2023_1/UnderGrad_AIED"
+setwd(infile)
+getwd()
+load("PISA2018MS_KOR_BQ.Rdata")
+```
+
+### Classification using the logistic regression
+
+#### Make the table of the outcome variable `EC154Q02IA`
+* EC154Q02IA: attending additional instruction in mathematics
+* Make sure to to include if there are any missing cases (`useNA='always'`)
+
+```{r NAcheck}
+table(PISA2018MS_KOR$EC154Q02IA, useNA='always')
+```
+
+#### Treatment of outcome variable
+* Remove the missing cases of the outcome variable 
+* Check the dimension
+* Recode 1 -> 0 & 2 -> 1
+* Create the table again to check if the recoding is done successfully
+```{r outcome}
+PISA2018MS_KOR <- PISA2018MS_KOR[!is.na(PISA2018MS_KOR$EC154Q02IA),]
+dim(PISA2018MS_KOR) 
+PISA2018MS_KOR$EC154Q02IA <- PISA2018MS_KOR$EC154Q02IA - 1
+table(PISA2018MS_KOR$EC154Q02IA, useNA='always')
+```
+
+###  Three ways to compute proportions: outcome variable by gender 
+#### Create three types of tables 
+```{r proportions}
+contab <- table(Math = PISA2018MS_KOR$EC154Q02IA, Gender = PISA2018MS_KOR$ST004D01T)
+prop.table(contab) # out of all students (N=6429 excluding missing cases)
+prop.table(contab, margin = 1)
+prop.table(contab, margin = 2)
+```
+
+#### Interpret the proportions of each table
+
+* Out of total observations, 30.4% are male who do not attend additional instruction in math, while 21.2% are male who attend additional instruction in math. Similarly, 29.4% are female who do not attend additional instruction in math, while 19.1% are female who attend additional instruction in math.
+* Among the students who do not attend additional instruction in math (conditional on math == 2), 50.9% are male students while 49.1% are female students. Among the students who attend additional instruction in math (conditional on math == 1), 52.6% are male students while 47.4% are female students.
+* Among female students (conditional on gender == 1), 39.4% attend additional instruction in math, while 60.6% do not attend. Among male students (conditional on gender == 2), 41.0% attend additional instruction in math, while 59.0% do not attend.
+
+### Logistic regression
+#### Fit the following three logistic regressions (no interpretation is required)
+* M1: EC154Q02IA by ST004D01T (gender)
+* M2: EC154Q02IA by explanatory variable: PV1MATH,  ST004D01T (gender)
+* M3: EC154Q02IA by explanatory variables: PV1MATH, ST004D01T (gender), interaction between PV1MATH and ST004D01T (gender)
+
+```{r logit_reg}
+M1 <- glm(EC154Q02IA ~ as.factor(ST004D01T), data = PISA2018MS_KOR, family = "binomial")
+summary(M1)
+M2 <- glm(EC154Q02IA ~ as.factor(ST004D01T)+ PV1MATH, data = PISA2018MS_KOR, family = "binomial")
+summary(M2)
+M3 <- glm(EC154Q02IA ~ as.factor(ST004D01T)+ PV1MATH + as.factor(ST004D01T):PV1MATH, data = PISA2018MS_KOR, family = "binomial")
+summary(M3)
+```
+
+### [BONUS] Model Evaluation (5 points)
+#### Predict the probabilities and values (either 0 or 1) from each model
+* Use `get_logistic_pred` function in the lecture notes
+* You need to generate three sets of predicted values based on each model (M1, M2, M3)
+```{r logit_pred}
+get_logistic_pred = function(mod, data, res = "y", pos = 1, neg = 0, cut = 0.5) {
+  probs = predict(mod, newdata = data, type = "response")
+  ifelse(probs >= cut, pos, neg)
+}
+M1_pred <- get_logistic_pred(M1, data = PISA2018MS_KOR, res = "EC154Q02IA", cut = 0.5)
+M2_pred <- get_logistic_pred(M2, data = PISA2018MS_KOR, res = "EC154Q02IA", cut = 0.5)
+M3_pred <- get_logistic_pred(M3, data = PISA2018MS_KOR, res = "EC154Q02IA", cut = 0.5)
+```
+
+#### Evaluate models (M2 & M3) based on the following quantities
+* Report Accuracy, Specificity, Subjectivity, F1 score from M2 & M3
+* Use `confusion matrix`
+```{r ROC}
+M2_tab <- table(pred = M2_pred, actual = PISA2018MS_KOR$EC154Q02IA)
+M3_tab <- table(pred = M3_pred, actual = PISA2018MS_KOR$EC154Q02IA)
+
+library(caret)
+confusionMatrix(M2_tab, positive = "1", mode = "everything")
+confusionMatrix(M3_tab, positive = "1", mode = "everything")
+```

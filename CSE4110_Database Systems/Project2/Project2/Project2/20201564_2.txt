@@ -1,0 +1,29 @@
+SET SQL_SAFE_UPDATES = 0;
+
+delete from Sale;
+delete from Tracking;
+delete from Shipper;
+delete from Payment;
+delete from Package;
+delete from Product;
+delete from Management;
+delete from Ordering;
+delete from Manufacturer;
+delete from Component;
+delete from Brand;
+delete from Store;
+delete from Customer;
+
+drop table Sale;
+drop table Tracking;
+drop table Shipper;
+drop table Payment;
+drop table Package;
+drop table Product;
+drop table Management;
+drop table Ordering;
+drop table Manufacturer;
+drop table Component;
+drop table Brand;
+drop table Store;
+drop table Customer;
